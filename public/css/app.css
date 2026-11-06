@@ -1,0 +1,572 @@
+/* ==========================================================================
+   Soltani ۵ — app layer on top of the Sash admin template.
+   The template asks for `vazirmatn` but never declares it, so Persian text was
+   falling back to whatever the OS had. Self-hosted here (no CDN dependency:
+   the production host is in Iran).
+   ========================================================================== */
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('/fonts/vazirmatn/Vazirmatn-400.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('/fonts/vazirmatn/Vazirmatn-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('/fonts/vazirmatn/Vazirmatn-700.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --app-ink: #1d2340;
+    --app-muted: #737a91;
+    --app-line: #e9ebf3;
+    --app-surface: #ffffff;
+    --app-bg: #f5f6fb;
+    --app-primary: #5b57c7;
+    --app-primary-soft: #eeedfb;
+    --app-success: #1a9d5f;
+    --app-success-soft: #e7f7ef;
+    --app-danger: #cf4453;
+    --app-danger-soft: #fdecee;
+    --app-warning: #b5761a;
+    --app-warning-soft: #fdf4e4;
+    --app-radius: 14px;
+}
+
+body,
+body.app,
+.form-control,
+.btn,
+.table,
+.card,
+h1, h2, h3, h4, h5, h6,
+input, select, textarea, button {
+    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif !important;
+}
+
+body.app {
+    background: var(--app-bg);
+    color: var(--app-ink);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* numbers line up in tables and stat cards */
+.number-font,
+.stat-value,
+.table-app td,
+.table-app th {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+}
+
+/* digit runs like 1402-1403 must not be reordered by the RTL paragraph */
+bdi {
+    unicode-bidi: isolate;
+}
+
+/* ---------- header ---------- */
+.app-header {
+    background: rgba(255, 255, 255, .86);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--app-line);
+    min-height: 62px;
+}
+
+.app-header .header-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--app-ink);
+}
+
+.app-header .header-sub {
+    font-size: 12px;
+    color: var(--app-muted);
+}
+
+.user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px 5px 6px;
+    border: 1px solid var(--app-line);
+    border-radius: 999px;
+    background: #fff;
+    font-size: 13px;
+    color: var(--app-ink);
+}
+
+.user-chip .avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--app-primary-soft);
+    color: var(--app-primary);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* ---------- page shells ---------- */
+
+/* The template's header is position:fixed (65px) but the content area was not
+   offset, so every page's first block (page title, card header with the
+   "add student" button) rendered underneath it. */
+body.app .page-main { padding-top: 66px; }
+
+@media (max-width: 575px) {
+    body.app .page-main { padding-top: 74px; }
+}
+
+@media print {
+    body.app .page-main { padding-top: 0; }
+}
+.page-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.page-subtitle {
+    font-size: 13px;
+    color: var(--app-muted);
+    margin: 2px 0 0;
+}
+
+.card {
+    border: 1px solid var(--app-line);
+    border-radius: var(--app-radius);
+    box-shadow: 0 1px 2px rgba(24, 30, 60, .04);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--app-line);
+    padding: 14px 18px;
+}
+
+.card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.card-body {
+    padding: 18px;
+}
+
+/* ---------- stat cards ---------- */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+/* long rial figures must never bleed out of the card */
+.stat-card { min-width: 0; }
+.stat-card > div:last-child { min-width: 0; }
+.stat-value { overflow: hidden; text-overflow: ellipsis; }
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--app-surface);
+    border: 1px solid var(--app-line);
+    border-radius: var(--app-radius);
+    box-shadow: 0 1px 2px rgba(24, 30, 60, .04);
+}
+
+.stat-card .stat-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    border-radius: 11px;
+    display: grid;
+    place-items: center;
+    font-size: 16px;
+    background: var(--app-primary-soft);
+    color: var(--app-primary);
+}
+
+.stat-card .stat-label {
+    font-size: 12px;
+    color: var(--app-muted);
+    margin-bottom: 2px;
+}
+
+.stat-card .stat-value {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+}
+
+.stat-card .stat-hint {
+    font-size: 11px;
+    color: var(--app-muted);
+    margin-top: 2px;
+}
+
+.stat-card.is-success .stat-icon { background: var(--app-success-soft); color: var(--app-success); }
+.stat-card.is-success .stat-value { color: var(--app-success); }
+.stat-card.is-danger .stat-icon { background: var(--app-danger-soft); color: var(--app-danger); }
+.stat-card.is-danger .stat-value { color: var(--app-danger); }
+.stat-card.is-warning .stat-icon { background: var(--app-warning-soft); color: var(--app-warning); }
+.stat-card.is-warning .stat-value { color: var(--app-warning); }
+
+/* nine report cards read better as 3x3 than as 4+4+1 */
+.stat-grid.is-thirds { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (max-width: 991px) {
+    .stat-grid.is-thirds { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 575px) {
+    .stat-grid.is-thirds { grid-template-columns: 1fr; }
+}
+
+/* the template's *-transparent badges wash the label out; give them contrast */
+.badge.bg-danger-transparent { background: var(--app-danger-soft) !important; color: var(--app-danger) !important; }
+.badge.bg-success-transparent { background: var(--app-success-soft) !important; color: var(--app-success) !important; }
+.badge.bg-warning-transparent { background: var(--app-warning-soft) !important; color: var(--app-warning) !important; }
+.badge.bg-info-transparent { background: var(--app-primary-soft) !important; color: var(--app-primary) !important; }
+.badge.bg-secondary-transparent { background: #f0f1f6 !important; color: var(--app-muted) !important; }
+
+/* report page keeps its own markup: tame the template's huge numbers there */
+.report-card .card-body { padding: 14px 16px; }
+.report-card h6 { font-size: 12px; color: var(--app-muted); margin-bottom: 6px; }
+.report-card h2 { font-size: 20px; font-weight: 700; margin: 0; }
+
+/* ---------- tables ---------- */
+.table-app {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-app thead th {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--app-muted);
+    background: #fafbfe;
+    border-bottom: 1px solid var(--app-line);
+    padding: 10px 12px;
+    white-space: nowrap;
+}
+
+.table-app tbody td {
+    padding: 11px 12px;
+    border-bottom: 1px solid var(--app-line);
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.table-app tbody tr:hover { background: #fbfcff; }
+.table-app tbody tr.is-settled { background: var(--app-success-soft); }
+.table-app tbody tr.is-settled:hover { background: #ddf3e8; }
+.table-app tbody tr:last-child td { border-bottom: 0; }
+.table-app .num { text-align: left; direction: ltr; }
+
+.table-wrap {
+    border: 1px solid var(--app-line);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* action buttons stay readable inside RTL flex cells */
+.row-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+    line-height: 1;
+}
+
+.row-actions > * {
+    display: inline-flex;
+    align-items: center;
+}
+
+.row-actions .btn-xs {
+    height: 28px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* keep every control visible on one line; the table scrolls when it must */
+.table-app th:last-child,
+.table-app td:last-child,
+.table.table-bordered th:last-child,
+.table.table-bordered td:last-child {
+    min-width: 132px;
+    white-space: nowrap;
+}
+
+.btn-xs {
+    padding: 3px 9px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+/* compact row actions: 28px square, hairline border, no shadows or gradients */
+.btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid var(--app-line);
+    border-radius: 8px;
+    background: #fff;
+    color: #5c6480;
+    font-size: 13px;
+    line-height: 1;
+    transition: background-color .12s ease, color .12s ease, border-color .12s ease;
+}
+
+.btn-icon:hover {
+    background: #f4f5fb;
+    border-color: #dfe3ee;
+    color: var(--app-ink);
+}
+
+.btn-icon.is-danger:hover {
+    background: var(--app-danger-soft);
+    border-color: #f6d6da;
+    color: var(--app-danger);
+}
+
+.btn-icon:focus-visible {
+    outline: 2px solid var(--app-primary);
+    outline-offset: 1px;
+}
+
+.badge-soft-success { background: var(--app-success-soft); color: var(--app-success); }
+.badge-soft-danger { background: var(--app-danger-soft); color: var(--app-danger); }
+.badge-soft-muted { background: #f0f1f6; color: var(--app-muted); }
+
+.badge {
+    font-weight: 500;
+    border-radius: 7px;
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+/* empty / muted text */
+.text-muted { color: var(--app-muted) !important; }
+.text-danger { color: var(--app-danger) !important; }
+.text-success { color: var(--app-success) !important; }
+
+/* template tables (ported screens still use .table.table-bordered) */
+.table.table-bordered {
+    border-color: var(--app-line);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table.table-bordered > :not(caption) > * > * {
+    border-color: var(--app-line);
+    padding: 10px 12px;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.table.table-bordered thead th {
+    background: #fafbfe;
+    color: var(--app-muted);
+    font-weight: 500;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.table.table-bordered tbody tr:hover { background: #fbfcff; }
+.table.table-bordered tbody tr.is-settled { background: var(--app-success-soft); }
+.table.table-bordered tbody tr.is-settled:hover { background: #ddf3e8; }
+
+/* compact grouped-report tables (by grade / field / class) */
+.breakdown-table { font-size: 12px; }
+.breakdown-table th,
+.breakdown-table td { padding: 7px 8px; white-space: nowrap; }
+.breakdown-table thead th { font-size: 11px; }
+
+/* ---------- forms ---------- */
+.form-label {
+    font-size: 12.5px;
+    color: var(--app-ink);
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    border-color: #dfe3ee;
+    padding: 9px 12px;
+    font-size: 13.5px;
+    height: auto;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--app-primary);
+    box-shadow: 0 0 0 3px rgba(91, 87, 199, .12);
+}
+
+.field {
+    margin-bottom: 14px;
+}
+
+.field-hint {
+    font-size: 11.5px;
+    color: var(--app-muted);
+    margin-top: 4px;
+}
+
+.btn {
+    border-radius: 10px;
+    font-size: 13px;
+    padding: 8px 14px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: var(--app-primary);
+    border-color: var(--app-primary);
+}
+
+.btn-primary:hover { background: #4d49b6; border-color: #4d49b6; }
+
+.btn-sm { padding: 6px 11px; font-size: 12.5px; }
+
+/* ---------- sidebar ---------- */
+.app-sidebar { background: #fff; border-inline-start: 1px solid var(--app-line); }
+.side-header h3 { font-size: 15px; font-weight: 700; color: var(--app-ink); }
+.side-menu__label { font-size: 13.5px; }
+.side-menu__item.active .side-menu__label { color: var(--app-primary); font-weight: 600; }
+.side-menu__item:hover { background: #f7f7fd; border-radius: 10px; }
+
+/* DataTables: Persian search box + clean chrome */
+.dataTables_wrapper .dataTables_filter input {
+    border-radius: 10px !important;
+    border: 1px solid #dfe3ee !important;
+    padding: 6px 10px !important;
+    margin-inline-start: 6px;
+}
+
+.dataTables_wrapper .dataTables_filter input::placeholder { color: #a3a9bd; }
+.dataTables_wrapper .dataTables_length select {
+    border-radius: 8px;
+    padding: 4px 26px 4px 8px;
+    min-width: 74px;
+    border: 1px solid #dfe3ee;
+}
+
+/* sorting arrows: quiet until hover */
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc:after {
+    opacity: .25;
+}
+
+table.dataTable thead th:hover::before,
+table.dataTable thead th:hover::after { opacity: .6; }
+
+/* quiet action buttons (the ported screens use solid btn-* colours) */
+.row-actions .btn,
+td .btn-xs {
+    border: 1px solid transparent;
+    box-shadow: none;
+}
+
+.btn-ghost {
+    background: #f5f6fb;
+    color: var(--app-ink);
+    border-color: var(--app-line);
+}
+
+.btn-ghost:hover { background: #edeefa; color: var(--app-primary); }
+
+/* ---------- login ---------- */
+.auth-shell {
+    direction: rtl;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+        radial-gradient(900px 500px at 85% -10%, rgba(91, 87, 199, .16), transparent 60%),
+        radial-gradient(700px 400px at 10% 110%, rgba(26, 157, 95, .12), transparent 60%),
+        var(--app-bg);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: #fff;
+    border: 1px solid var(--app-line);
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(29, 35, 64, .08);
+    padding: 30px 28px 24px;
+}
+
+.auth-mark {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    background: var(--app-primary);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 14px;
+}
+
+.auth-title { font-size: 19px; font-weight: 700; margin: 0 0 4px; }
+.auth-sub { font-size: 12.5px; color: var(--app-muted); margin: 0 0 20px; }
+.auth-foot { font-size: 11.5px; color: var(--app-muted); text-align: center; margin-top: 16px; }
+
+/* ---------- print ---------- */
+@media print {
+    .app-header, .app-sidebar, #back-to-top, .no-print { display: none !important; }
+    body.app { background: #fff; }
+    .card { border: 0; box-shadow: none; }
+}
+
+@media (max-width: 991px) {
+    .stat-value { font-size: 17px; }
+    .stat-card { padding: 12px 13px; }
+    .stat-card .stat-icon { width: 34px; height: 34px; flex-basis: 34px; font-size: 14px; }
+}
+
+@media (max-width: 575px) {
+    .stat-grid { grid-template-columns: 1fr; }
+    .card-body { padding: 14px; }
+    .stat-value { font-size: 17px; }
+    .page-title { font-size: 17px; }
+    .app-header .header-title { font-size: 14px; }
+    .app-header .header-sub { font-size: 11px; }
+}
