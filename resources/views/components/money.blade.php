@@ -4,5 +4,6 @@
     'strong' => false,
 ])
 
-{{-- One place for money formatting: number grouping, currency label, tabular digits. --}}
-<span @class(['money', 'fw-bold' => $strong])>@fa((int) $value)@if ($suffix !== '') {{ $suffix }}@endif</span>
+{{-- Number grouping, Persian digits, and the currency on its own line when the
+     card is narrow — the figure is never truncated. --}}
+<span @class(['money', 'fw-bold' => $strong])><bdi class="num">{{ \App\Support\PersianNumber::format((int) $value) }}</bdi>@if ($suffix !== '') <span class="cur">{{ $suffix }}</span>@endif</span>

@@ -258,6 +258,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.20/sweetalert2.all.min.js"></script>
 
     <script>
+        // The fixed header changes height with its content (wrapping title, user chip,
+        // year badge), so the page offset is measured instead of hard-coded.
+        (function () {
+            const setHeaderHeight = () => {
+                const header = document.querySelector('.app-header');
+                if (header) {
+                    document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+                }
+            };
+            setHeaderHeight();
+            window.addEventListener('load', setHeaderHeight);
+            window.addEventListener('resize', setHeaderHeight);
+        })();
+
         // Persian strings for the DataTables plugin (V1 shipped English defaults)
         if (window.jQuery && jQuery.fn.dataTable) {
             jQuery.extend(true, jQuery.fn.dataTable.defaults, {

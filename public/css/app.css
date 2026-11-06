@@ -122,14 +122,10 @@ bdi {
 
 /* ---------- page shells ---------- */
 
-/* The template's header is position:fixed (65px) but the content area was not
-   offset, so every page's first block (page title, card header with the
-   "add student" button) rendered underneath it. */
-body.app .page-main { padding-top: 66px; }
-
-@media (max-width: 575px) {
-    body.app .page-main { padding-top: 74px; }
-}
+/* The template's header is position:fixed; the content offset is measured at
+   runtime (--header-h) because the bar is taller when the title wraps or the
+   user chip is visible — a hard-coded 66px left content underneath it on tablets. */
+body.app .page-main { padding-top: var(--header-h, 66px); }
 
 @media print {
     body.app .page-main { padding-top: 0; }
@@ -179,7 +175,10 @@ body.app .page-main { padding-top: 66px; }
 /* long rial figures must never bleed out of the card */
 .stat-card { min-width: 0; }
 .stat-card > div:last-child { min-width: 0; }
-.stat-value { overflow: hidden; text-overflow: ellipsis; }
+.stat-value { white-space: normal; line-height: 1.35; }
+.stat-value .money { display: inline; }
+.stat-value .money .num { white-space: nowrap; }
+.stat-value .money .cur { white-space: nowrap; font-size: 12px; color: var(--app-muted); }
 
 .stat-card {
     display: flex;
@@ -554,6 +553,13 @@ td .btn-xs {
     .app-header, .app-sidebar, #back-to-top, .no-print { display: none !important; }
     body.app { background: #fff; }
     .card { border: 0; box-shadow: none; }
+}
+
+/* the report has nine cards in three columns — the figures need a smaller size
+   between 992 and 1300px or the longest one (15,090,329,060) overflows its card */
+@media (min-width: 992px) and (max-width: 1330px) {
+    .stat-grid.is-thirds .stat-value { font-size: 15px; }
+    .stat-grid.is-thirds .stat-card { padding: 13px 14px; gap: 10px; }
 }
 
 @media (max-width: 991px) {
