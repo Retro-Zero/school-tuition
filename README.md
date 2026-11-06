@@ -70,7 +70,17 @@ phone numbers in the screenshots are generated.
 
 ## Migrating from the old app
 
-The rewrite ships with the importer that was used for the real migration:
+For the school itself — someone who doesn't write code — there is a guided,
+double-clickable upgrade: **`scripts/windows/upgrade.bat`** (or
+`scripts/macos/upgrade.command`) asks for the old database details, backs the old
+database up, builds the new one, imports, and refuses to finish unless the totals match.
+Step-by-step in Persian: [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
+It is safe by construction: the old database is only ever read (a `SELECT`-only MySQL
+user is enough — verified), the source is dumped before anything runs, and the old
+application keeps working, so rolling back is just closing the new window.
+
+Under the hood, the same importer is available on the command line:
 
 ```bash
 # .env: V1_DB_* pointing at the old database (read-only connection)

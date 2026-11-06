@@ -3,7 +3,7 @@
 @section('content')
     <div class="auth-shell">
         <div class="auth-card">
-            <div class="auth-mark">۵</div>
+            <div class="auth-mark"><i class="fa fa-university"></i></div>
             <h1 class="auth-title">{{ config('school.name') }}</h1>
             <p class="auth-sub">{{ config('school.subtitle') }} — ورود کارکنان</p>
 
